@@ -1,0 +1,112 @@
+SELECT * FROM Walmart;
+
+----Which branches generate the highest total sales?
+
+SELECT 
+    "Branch" AS branch,
+    SUM(total) AS total_sales
+FROM 
+    walmart
+GROUP BY 
+    "Branch"
+ORDER BY 
+    total_sales DESC;
+
+
+---the top 5 categories contributing the most to the total profit
+
+SELECT 
+		category AS category_name,
+		SUM(profit_margin) AS profit
+FROM walmart
+GROUP BY category
+ORDER BY profit DESC
+LIMIT 5;
+
+
+---the most frequently used payment methods across branches
+
+SELECT
+		"Branch" AS branch,
+		payment_method,
+		COUNT(*) AS payment_count
+FROM walmart
+GROUP BY branch ,payment_method
+ORDER BY branch ,payment_count DESC
+
+---Which transactions received the highest customer ratings?
+
+SELECT 
+	invoice_id,
+	"Branch" as branch,
+	rating,
+	total
+FROM walmart
+WHERE rating = (SELECT MAX(rating) FROM walmart)
+ORDER BY total DESC;
+---How does total revenue vary day by day?
+
+SELECT 
+	date,
+	SUM(total) AS daily_revenue
+FROM walmart
+GROUP BY date
+ORDER BY date;
+
+
+---What are the busiest hours for sales across branches?
+
+SELECT 
+	EXTRACT(HOUR FROM time::Time) AS sale_hour,
+	"Branch" AS branch,
+	COUNT(*) AS transaction_count
+FROM walmart
+GROUP BY branch , sale_hour
+ORDER BY branch , transaction_count DESC;
+
+---Which products/categories have the highest sales quantities?
+
+SELECT 
+	SUM(quantity) AS Qty_sold,
+	category AS category_name
+FROM walmart
+GROUP BY category
+ORDER BY Qty_sold DESC;
+
+---How does profit margin change across months or seasons?
+
+SELECT
+	CASE
+		WHEN EXTRACT (MONTH FROM TO_DATE (date, 'DD/MM/YY')) IN (12 , 1 , 2) THEN 'Winter'
+		WHEN EXTRACT (MONTH FROM TO_DATE (date, 'DD/MM/YY')) IN (3 , 4 , 5) THEN 'Spring'
+		WHEN EXTRACT (MONTH FROM TO_DATE (date, 'DD/MM/YY')) IN (6 , 7 , 8) THEN 'Summer'
+		WHEN EXTRACT (MONTH FROM TO_DATE (date, 'DD/MM/YY')) IN (9 , 10 , 11) THEN 'Fall'
+	END AS season,
+	AVG(profit_margin) AS average_profit_margin
+
+FROM walmart
+GROUP BY season
+ORDER BY season;
+
+
+---Which cities contribute the most to overall sales?
+
+SELECT 
+	"City" AS city,
+	SUM(total) AS total_sales
+fROM walmart
+GROUP BY City
+ORDER BY total_sales DESC;
+
+---Problem: Does lowering unit price correlate with higher sales quantity?
+---calculate the correlation coefficient between the two variables: unit price and quantity.
+
+SELECT 
+	unit_price,
+	quantity
+	
+FROM walmart;
+
+SELECT 
+	CORR(unit_price , quantity) AS correlation
+FROM walmart;
